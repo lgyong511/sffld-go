@@ -1,0 +1,9 @@
+app:
+    authtimeout: 2
+    port: 2580
+log:
+    caller: false
+    format: json
+    level: debug
+    multiout: false
+    output: ""
