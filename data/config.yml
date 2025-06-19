@@ -1,5 +1,5 @@
 app:
-    authtimeout: 2
+    authtimeout: 3
     port: 2580
 log:
     caller: false

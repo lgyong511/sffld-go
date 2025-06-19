@@ -7,8 +7,15 @@ import (
 )
 
 func main() {
-	vp := vp.New().Set().Relod()
+	vp := vp.New()
 	conf := vp.Get()
 	fmt.Printf("conf: %v\n", conf)
+	conf.App.AuthTimeout = 10
+	// vp.MergeConfigMap()
+	fmt.Printf("conf: %v\n", conf)
+	// vp.Save()
+	fmt.Printf("vp.Get(): %v\n", vp.Get())
+
 	select {}
+
 }

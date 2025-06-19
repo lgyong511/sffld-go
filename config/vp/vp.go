@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// MgrViper viper管理
 type MgrViper struct {
 	// 配置文件路径
 	file *string
@@ -20,21 +21,29 @@ type MgrViper struct {
 	vp   *viper.Viper
 }
 
+// 创建一个MgrViper实例
 func New() *MgrViper {
-	defaultFile := "." + string(os.PathSeparator) + "data" + string(os.PathSeparator) + "config.yml"
-	return &MgrViper{
-		pflag.StringP("file", "c", defaultFile, "配置文件"),
-		new(config.Config),
-		viper.GetViper(),
+	// defaultFile := "." + string(os.PathSeparator) + "data" + string(os.PathSeparator) + "config.yml"
+	defaultFile := filepath.Join(".", "data", "config.yml")
+	m := &MgrViper{
+		file: &defaultFile,
+		conf: new(config.Config),
+		vp:   viper.New(),
 	}
+	return m.init().reload()
 }
 
-// 设置配置信息，命令行、环境变量、配置文件
-func (m *MgrViper) Set() *MgrViper {
+// Set 设置配置信息，命令行、环境变量、配置文件
+func (m *MgrViper) init() *MgrViper {
+
 	logrus.Info("开始加载配置信息。。。")
+
 	// 处理命令行参数
-	pflag.IntP("app.port", "p", 2580, "app port")
-	pflag.Parse()
+	if !pflag.Parsed() { //确保只执行一次
+		m.file = pflag.StringP("file", "c", *m.file, "配置文件")
+		pflag.IntP("app.port", "p", 2580, "app port")
+		pflag.Parse()
+	}
 
 	// 处理环境变量
 	m.vp.AutomaticEnv()
@@ -62,35 +71,40 @@ func (m *MgrViper) Set() *MgrViper {
 	// 设置默认值
 	m.vp.SetDefault("app.port", 2580)
 	m.vp.SetDefault("app.authTimeout", 2)
-	m.vp.SetDefault("log.level", "info")
-	m.vp.SetDefault("log.format", "json")
+	// m.vp.SetDefault("log.level", "info")
+	// m.vp.SetDefault("log.format", "json")
 
-	logrus.WithFields(logrus.Fields(m.vp.AllSettings())).Info("配置信息")
-	return m
-}
+	logrus.Info("加载配置信息完成。。。")
 
-// 获取所有配置信息，命令行、环境变量、配置文件
-func (m *MgrViper) Get() *config.Config {
 	// 反序列化
 	if err := m.vp.Unmarshal(m.conf); err != nil {
 		logrus.WithError(err).Error("反序列化到结构体失败！")
 	}
 
+	return m
+}
+
+// Get 获取配置信息
+func (m *MgrViper) Get() *config.Config {
+
 	return m.conf
 }
 
-// 启用配置文件修改监控
-func (m *MgrViper) Relod() *MgrViper {
-	viper.WatchConfig()
-	viper.OnConfigChange(func(in fsnotify.Event) {
-		m.Get()
-		logrus.WithFields(logrus.Fields(m.vp.AllSettings())).Info("配置信息")
+// Relod 启用配置文件修改监控
+func (m *MgrViper) reload() *MgrViper {
+	m.vp.WatchConfig()
+	m.vp.OnConfigChange(func(in fsnotify.Event) {
+		logrus.Info("检测到配置文件变更，重新加载配置")
+		// 反序列化
+		if err := m.vp.Unmarshal(m.conf); err != nil {
+			logrus.WithError(err).Error("反序列化到结构体失败！")
+		}
 	})
 
 	return m
 }
 
-// 保存配置到文件
+// Save 保存配置到文件
 func (m *MgrViper) Save() error {
 
 	// 创建配置文件目录，已存在和创建成功返回nil
@@ -98,13 +112,7 @@ func (m *MgrViper) Save() error {
 		logrus.WithError(err).Error("创建目录失败！")
 		return err
 	}
-	// 保存前先把结构体重新设置到viper
-	configMap := make(map[string]interface{})
-	if err := mapstructure.Decode(m.conf, &configMap); err != nil {
-		logrus.WithError(err).Error("结构体转成map失败！")
-		return err
-	}
-	if err := viper.MergeConfigMap(configMap); err != nil {
+	if err := m.MergeConfigMap(); err != nil {
 		logrus.WithError(err).Error("map绑定到viper失败！")
 		return err
 	}
@@ -120,6 +128,25 @@ func (m *MgrViper) Save() error {
 			return err
 		}
 	}
-	logrus.Info("配置保存成功！")
+	logrus.WithFields(logrus.Fields(m.vp.AllSettings())).Info("配置保存成功！")
+	return nil
+}
+
+// mergeConfigMap 把配置信息结构体重新合并到vp中
+// 使用场景：1、保存配置信息到文件
+//
+//	2、conf.App.AuthTimeout = 10 方式修改了配置信息在Get前
+func (m *MgrViper) MergeConfigMap() error {
+
+	// 保存前先把结构体重新设置到viper
+	configMap := make(map[string]interface{})
+	if err := mapstructure.Decode(m.conf, &configMap); err != nil {
+		logrus.WithError(err).Error("结构体转成map失败！")
+		return err
+	}
+	if err := m.vp.MergeConfigMap(configMap); err != nil {
+		logrus.WithError(err).Error("map绑定到viper失败！")
+		return err
+	}
 	return nil
 }
