@@ -11,7 +11,7 @@ import (
 
 // 日志配置
 
-// setLogurs 配置日志
+// SetLogurs 配置日志
 func SetLogurs(logConf *config.Log) {
 	logrus.SetReportCaller(logConf.Caller)
 	logrus.SetLevel(getLevel(logConf.Level))
@@ -31,7 +31,6 @@ func SetLogurs(logConf *config.Log) {
 }
 
 // getWriter 获取日志输出
-// "data/log-%Y%m%d%H%M.log"
 func getWriter(path string, multiOut bool) io.Writer {
 
 	if len(path) == 0 {

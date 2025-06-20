@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// ReloadCallback 配置变更回调函数
 type ReloadCallback func(*config.Config)
 
 // MgrViper viper管理
@@ -25,7 +26,7 @@ type MgrViper struct {
 	callbacks []ReloadCallback
 }
 
-// 创建一个MgrViper实例
+// New 创建一个MgrViper实例
 func New() *MgrViper {
 	// defaultFile := "." + string(os.PathSeparator) + "data" + string(os.PathSeparator) + "config.yml"
 	defaultFile := filepath.Join(".", "data", "config.yml")
@@ -42,7 +43,7 @@ func (m *MgrViper) AddReloadCallback(callback ReloadCallback) {
 	m.callbacks = append(m.callbacks, callback)
 }
 
-// Set 设置配置信息，命令行、环境变量、配置文件
+// init 初始化MgrViper实例，设置配置信息，命令行、环境变量、配置文件
 func (m *MgrViper) init() *MgrViper {
 
 	logrus.Info("开始加载配置信息。。。")
@@ -98,9 +99,11 @@ func (m *MgrViper) Get() *config.Config {
 	return m.conf
 }
 
-// Relod 启用配置文件修改监控
+// reload 启用配置文件修改监控
 func (m *MgrViper) reload() *MgrViper {
+	// 监控配置文件变化
 	m.vp.WatchConfig()
+	// 配置文件变更回调函数
 	m.vp.OnConfigChange(func(in fsnotify.Event) {
 		logrus.Info("检测到配置文件变更，重新加载配置")
 		// 反序列化
@@ -124,7 +127,7 @@ func (m *MgrViper) Save() error {
 		logrus.WithError(err).Error("创建目录失败！")
 		return err
 	}
-	if err := m.MergeConfigMap(); err != nil {
+	if err := m.mergeConfigMap(); err != nil {
 		logrus.WithError(err).Error("map绑定到viper失败！")
 		return err
 	}
@@ -145,15 +148,14 @@ func (m *MgrViper) Save() error {
 }
 
 // mergeConfigMap 把配置信息结构体重新合并到vp中
-// 使用场景：1、保存配置信息到文件
-func (m *MgrViper) MergeConfigMap() error {
-
-	// 保存前先把结构体重新设置到viper
+func (m *MgrViper) mergeConfigMap() error {
+	// 把结构体转成map
 	configMap := make(map[string]interface{})
 	if err := mapstructure.Decode(m.conf, &configMap); err != nil {
 		logrus.WithError(err).Error("结构体转成map失败！")
 		return err
 	}
+	// 保存前先把结构体重新设置到viper
 	if err := m.vp.MergeConfigMap(configMap); err != nil {
 		logrus.WithError(err).Error("map绑定到viper失败！")
 		return err

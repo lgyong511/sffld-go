@@ -25,7 +25,7 @@ func init() {
 
 	conf := vp.Get()
 	lg.SetLogurs(conf.Log)
-	fmt.Printf("conf: %v\n", conf)
+	fmt.Println("app:", conf.App, "log:", conf.Log)
 
 	vp.AddReloadCallback(func(conf *config.Config) {
 		lg.SetLogurs(conf.Log)

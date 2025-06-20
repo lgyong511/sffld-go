@@ -24,9 +24,11 @@ type Log struct {
 	JSONFormat bool `yaml:"JSONFormat"`
 	// 日志输出
 	// 空值将日志输出到控制台
+	// 支持日期格式："data/log-%Y%m%d%H%M.log"
 	Output string `yaml:"output"`
 	// 是否同时输出到控制台和文件
-	MultiOut bool
+	// Output有值时有效
+	MultiOut bool `yaml:"multiout"`
 	// 是否记录调用者
 	Caller bool `yaml:"caller"`
 }
