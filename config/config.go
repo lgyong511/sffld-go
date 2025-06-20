@@ -4,8 +4,8 @@ package config
 
 // Config 配置信息
 type Config struct {
-	App App `yaml:"app"`
-	Log Log `yaml:"log"`
+	App *App `yaml:"app"`
+	Log *Log `yaml:"log"`
 }
 
 // App 应用程序
@@ -20,8 +20,8 @@ type App struct {
 type Log struct {
 	// 日志级别
 	Level string `yaml:"level"`
-	//日志输出格式，text、json
-	Format string `yaml:"format"`
+	//启用json日志输出格式
+	JSONFormat bool `yaml:"JSONFormat"`
 	// 日志输出
 	// 空值将日志输出到控制台
 	Output string `yaml:"output"`

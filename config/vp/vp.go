@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+type ReloadCallback func(*config.Config)
+
 // MgrViper viper管理
 type MgrViper struct {
 	// 配置文件路径
@@ -19,6 +21,8 @@ type MgrViper struct {
 	// 配置信息
 	conf *config.Config
 	vp   *viper.Viper
+	// 配置变更回调函数列表
+	callbacks []ReloadCallback
 }
 
 // 创建一个MgrViper实例
@@ -31,6 +35,11 @@ func New() *MgrViper {
 		vp:   viper.New(),
 	}
 	return m.init().reload()
+}
+
+// AddReloadCallback 添加配置变更回调函数
+func (m *MgrViper) AddReloadCallback(callback ReloadCallback) {
+	m.callbacks = append(m.callbacks, callback)
 }
 
 // Set 设置配置信息，命令行、环境变量、配置文件
@@ -86,7 +95,6 @@ func (m *MgrViper) init() *MgrViper {
 
 // Get 获取配置信息
 func (m *MgrViper) Get() *config.Config {
-
 	return m.conf
 }
 
@@ -98,6 +106,10 @@ func (m *MgrViper) reload() *MgrViper {
 		// 反序列化
 		if err := m.vp.Unmarshal(m.conf); err != nil {
 			logrus.WithError(err).Error("反序列化到结构体失败！")
+		}
+		// 调用回调函数
+		for _, callback := range m.callbacks {
+			callback(m.conf)
 		}
 	})
 
@@ -134,8 +146,6 @@ func (m *MgrViper) Save() error {
 
 // mergeConfigMap 把配置信息结构体重新合并到vp中
 // 使用场景：1、保存配置信息到文件
-//
-//	2、conf.App.AuthTimeout = 10 方式修改了配置信息在Get前
 func (m *MgrViper) MergeConfigMap() error {
 
 	// 保存前先把结构体重新设置到viper

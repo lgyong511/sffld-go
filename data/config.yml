@@ -3,7 +3,7 @@ app:
     port: 2580
 log:
     caller: false
-    format: json
+    JSONFormat: true
     level: debug
     multiout: false
     output: ""
