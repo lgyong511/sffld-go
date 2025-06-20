@@ -1,5 +1,7 @@
 package config
 
+import "github.com/sirupsen/logrus"
+
 // 配置信息结构体
 
 // Config 配置信息
@@ -31,4 +33,20 @@ type Log struct {
 	MultiOut bool `yaml:"multiout"`
 	// 是否记录调用者
 	Caller bool `yaml:"caller"`
+}
+
+func (c *Config) ToLogFields() logrus.Fields {
+	return logrus.Fields{
+		"app": map[string]interface{}{
+			"port":        c.App.Port,
+			"authTimeout": c.App.AuthTimeout,
+		},
+		"log": map[string]interface{}{
+			"level":      c.Log.Level,
+			"jsonFormat": c.Log.JSONFormat,
+			"output":     c.Log.Output,
+			"multiout":   c.Log.MultiOut,
+			"caller":     c.Log.Caller,
+		},
+	}
 }

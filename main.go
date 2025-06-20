@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/lgyong511/sffld-go/config"
@@ -11,6 +10,15 @@ import (
 )
 
 func main() {
+	vp := vp.New()
+	conf := vp.Get()
+	logrus.WithFields(conf.ToLogFields()).Debug("配置信息")
+
+	lg.SetLogurs(conf.Log)
+
+	vp.AddReloadCallback(func(conf *config.Config) {
+		lg.SetLogurs(conf.Log)
+	})
 
 	for {
 		logrus.Debug("debug")
@@ -18,17 +26,4 @@ func main() {
 		time.Sleep(10 * time.Second)
 	}
 
-}
-
-func init() {
-	vp := vp.New()
-
-	conf := vp.Get()
-	lg.SetLogurs(conf.Log)
-	fmt.Println("app:", conf.App, "log:", conf.Log)
-
-	vp.AddReloadCallback(func(conf *config.Config) {
-		lg.SetLogurs(conf.Log)
-		logrus.Info("配置文件变更，重新加载日志配置")
-	})
 }

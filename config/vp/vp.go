@@ -39,8 +39,8 @@ func New() *MgrViper {
 }
 
 // AddReloadCallback 添加配置变更回调函数
-func (m *MgrViper) AddReloadCallback(callback ReloadCallback) {
-	m.callbacks = append(m.callbacks, callback)
+func (m *MgrViper) AddReloadCallback(callbacks ...ReloadCallback) {
+	m.callbacks = append(m.callbacks, callbacks...)
 }
 
 // init 初始化MgrViper实例，设置配置信息，命令行、环境变量、配置文件
@@ -84,12 +84,14 @@ func (m *MgrViper) init() *MgrViper {
 	// m.vp.SetDefault("log.level", "info")
 	// m.vp.SetDefault("log.format", "json")
 
-	logrus.Info("加载配置信息完成。。。")
-
 	// 反序列化
 	if err := m.vp.Unmarshal(m.conf); err != nil {
 		logrus.WithError(err).Error("反序列化到结构体失败！")
 	}
+
+	logrus.SetLevel(logrus.DebugLevel)
+
+	logrus.Info("加载配置信息完成。。。")
 
 	return m
 }
@@ -114,6 +116,9 @@ func (m *MgrViper) reload() *MgrViper {
 		for _, callback := range m.callbacks {
 			callback(m.conf)
 		}
+		logrus.WithFields(m.conf.ToLogFields()).Info("重新加载配置完成。。。")
+		logrus.Info("重新加载配置完成。。。")
+
 	})
 
 	return m
@@ -143,7 +148,7 @@ func (m *MgrViper) Save() error {
 			return err
 		}
 	}
-	logrus.WithFields(logrus.Fields(m.vp.AllSettings())).Info("配置保存成功！")
+	logrus.Info("配置文件保存成功！")
 	return nil
 }
 

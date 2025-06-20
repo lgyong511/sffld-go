@@ -5,10 +5,12 @@ go 1.24.3
 require (
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-viper/mapstructure/v2 v2.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/lgyong511/logcuting v1.2.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.20.1
+	golang.org/x/crypto v0.32.0
 )
 
 require (
