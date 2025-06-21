@@ -13,7 +13,7 @@ type Config struct {
 // App 应用程序
 type App struct {
 	// gin监听端口号
-	Port int `yaml:"port"`
+	Port string `yaml:"port"`
 	// 鉴权超时时间，单位小时
 	AuthTimeout int `yaml:"authTimeout"`
 }

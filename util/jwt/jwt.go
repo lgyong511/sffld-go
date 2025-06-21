@@ -16,7 +16,8 @@ const (
 
 var (
 	// jwt密钥
-	secret = []byte(time.Now().Format(time.RFC3339Nano))
+	secret  = []byte(time.Now().Format(time.RFC3339Nano))
+	timeout = 3
 )
 
 // 自定义claims
@@ -25,8 +26,12 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
+func SetTimeout(t int) {
+	timeout = t
+}
+
 // GenToken 生成token
-func GenToken(username string, timeout int) (string, error) {
+func GenToken(username string) (string, error) {
 	claims := CustomClaims{
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
