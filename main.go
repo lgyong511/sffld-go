@@ -10,6 +10,7 @@ import (
 	"github.com/lgyong511/sffld-go/config/vp"
 	"github.com/lgyong511/sffld-go/middleware"
 	"github.com/lgyong511/sffld-go/router"
+	"github.com/lgyong511/sffld-go/util/jwt"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,7 +20,9 @@ func main() {
 	logrus.WithFields(conf.ToLogFields()).Debug("配置信息")
 
 	lg.SetLogurs(conf.Log)
+	jwt.SetTimeout(conf.App.AuthTimeout)
 
+	//配置热更新后，重新配置logrus
 	vp.AddReloadCallback(func(conf *config.Config) {
 		lg.SetLogurs(conf.Log)
 	})
@@ -30,6 +33,11 @@ func main() {
 	router.RegisterRouter(r)
 	g := graceful.New(":" + conf.App.Port)
 	g.Start(r)
+
+	// 配置热更新后，重启gin
+	vp.AddReloadCallback(func(conf *config.Config) {
+		g.Restart(":"+conf.App.Port, nil)
+	})
 
 	for {
 		logrus.Debug("debug")

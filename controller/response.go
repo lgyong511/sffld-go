@@ -27,7 +27,7 @@ const (
 	UsernameOrPasswordErrorCode
 )
 
-// code转文字
+// code转msg
 func CodeToMsg(code int) string {
 	switch code {
 	case SuccessCode:
@@ -53,14 +53,14 @@ func CodeToMsg(code int) string {
 	}
 }
 
-// api统一返回结构体，支持分页。
+// api统一返回结构体。
 type Response struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data,omitempty"`
 }
 
-// 定义成功返回
+// 定义成功返回handler
 func Success(c *gin.Context, data interface{}) {
 	c.JSON(200, &Response{
 		Code: SuccessCode,
@@ -69,7 +69,7 @@ func Success(c *gin.Context, data interface{}) {
 	})
 }
 
-// 定义失败返回
+// 定义失败返回handler
 func Error(c *gin.Context, code int, msg string) {
 	c.JSON(200, &Response{
 		Code: code,
@@ -77,7 +77,7 @@ func Error(c *gin.Context, code int, msg string) {
 	})
 }
 
-// 定义未授权返回
+// 定义未授权返回handler
 func Unauthorized(c *gin.Context, msg string) {
 	c.AbortWithStatusJSON(http.StatusUnauthorized, &Response{
 		Code: UnauthorizedCode,
@@ -85,7 +85,7 @@ func Unauthorized(c *gin.Context, msg string) {
 	})
 }
 
-// 定义分页返回
+// 定义分页返回handler
 func Page(c *gin.Context, data interface{}, count int) {
 	c.JSON(200, &Response{
 		Code: SuccessCode,
@@ -97,7 +97,7 @@ func Page(c *gin.Context, data interface{}, count int) {
 	})
 }
 
-// 定义自定义返回
+// 定义自定义返回handler
 func Custom(c *gin.Context, code int, msg string, data interface{}) {
 	c.JSON(200, &Response{
 		Code: code,
@@ -106,18 +106,7 @@ func Custom(c *gin.Context, code int, msg string, data interface{}) {
 	})
 }
 
-// 定义token返回
-func Token(c *gin.Context, token string) {
-	c.JSON(200, &Response{
-		Code: SuccessCode,
-		Msg:  "success",
-		Data: gin.H{
-			"token": token,
-		},
-	})
-}
-
-// 定义退出登录返回
+// 定义退出登录返回handler
 func Logout(c *gin.Context) {
 	c.JSON(200, &Response{
 		Code: SuccessCode,
@@ -125,7 +114,7 @@ func Logout(c *gin.Context) {
 	})
 }
 
-// 定义登录返回
+// 定义登录返回handler
 func Login(c *gin.Context, token string) {
 	c.JSON(200, &Response{
 		Code: SuccessCode,

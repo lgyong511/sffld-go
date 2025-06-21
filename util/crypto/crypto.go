@@ -25,7 +25,7 @@ func ComparePassword(password, hash string) bool {
 	return err == nil
 }
 
-// GenPassword 生成密码
+// GenPassword 生成加密密码
 func GenPassword(password, salt string) (string, error) {
 	b, err := bcrypt.GenerateFromPassword([]byte(password+salt), bcrypt.MaxCost)
 	if err != nil {

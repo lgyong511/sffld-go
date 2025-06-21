@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Login 登录
+// Login 登录handler
 func Login(c *gin.Context) {
 	//解析参数
 	user := new(model.User)
@@ -40,5 +40,5 @@ func Login(c *gin.Context) {
 	}
 
 	// 返回token
-	controller.Token(c, token)
+	controller.Login(c, token)
 }
