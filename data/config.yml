@@ -1,9 +1,9 @@
 app:
-    authtimeout: 3
-    port: 2580
+  port: "2580"
+  authTimeout: 12
 log:
-    caller: false
-    JSONFormat: true
-    level: debug
-    multiout: false
-    output: ""
+  level: debug
+  JSONFormat: true
+  output: ""
+  multiout: false
+  caller: false

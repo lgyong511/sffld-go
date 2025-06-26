@@ -6,33 +6,33 @@ import "github.com/sirupsen/logrus"
 
 // Config 配置信息
 type Config struct {
-	App *App `yaml:"app"`
-	Log *Log `yaml:"log"`
+	App *App `yaml:"app" json:"app"`
+	Log *Log `yaml:"log" json:"log"`
 }
 
 // App 主程序配置
 type App struct {
 	// gin监听端口号
-	Port string `yaml:"port"`
+	Port string `yaml:"port" json:"port"`
 	// 鉴权超时时间，单位小时
-	AuthTimeout int `yaml:"authTimeout"`
+	AuthTimeout int `yaml:"authTimeout" json:"authTimeout"`
 }
 
 // Log 日志
 type Log struct {
 	// 日志级别
-	Level string `yaml:"level"`
+	Level string `yaml:"level" json:"level"`
 	//启用json日志输出格式
-	JSONFormat bool `yaml:"JSONFormat"`
+	JSONFormat bool `yaml:"JSONFormat" json:"jsonFormat"`
 	// 日志输出
 	// 空值将日志输出到控制台
 	// 支持日期格式："data/log-%Y%m%d%H%M.log"
-	Output string `yaml:"output"`
+	Output string `yaml:"output" json:"output"`
 	// 是否同时输出到控制台和文件
 	// Output有值时有效
-	MultiOut bool `yaml:"multiout"`
+	MultiOut bool `yaml:"multiout" json:"multiout"`
 	// 是否记录调用者
-	Caller bool `yaml:"caller"`
+	Caller bool `yaml:"caller" json:"caller"`
 }
 
 // ToConfigFields 把配置信息转成logrus.Fields
