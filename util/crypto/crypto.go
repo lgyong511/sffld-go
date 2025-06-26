@@ -20,8 +20,12 @@ func GenSalt() (string, error) {
 }
 
 // ComparePassword 比较密码
-func ComparePassword(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+func ComparePassword(password, hash, salt string) bool {
+	base, err := base64.URLEncoding.DecodeString(hash)
+	if err != nil {
+		return false
+	}
+	err = bcrypt.CompareHashAndPassword(base, []byte(password+salt))
 	return err == nil
 }
 

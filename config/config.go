@@ -10,7 +10,7 @@ type Config struct {
 	Log *Log `yaml:"log"`
 }
 
-// App 应用程序
+// App 主程序配置
 type App struct {
 	// gin监听端口号
 	Port string `yaml:"port"`
@@ -35,7 +35,8 @@ type Log struct {
 	Caller bool `yaml:"caller"`
 }
 
-func (c *Config) ToLogFields() logrus.Fields {
+// ToConfigFields 把配置信息转成logrus.Fields
+func (c *Config) ToConfigFields() logrus.Fields {
 	return logrus.Fields{
 		"app": map[string]interface{}{
 			"port":        c.App.Port,

@@ -1,17 +1,20 @@
 package setup
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/lgyong511/sffld-go/controller"
+	"github.com/lgyong511/sffld-go/service/setup"
+)
 
-// 日志配置handler
-func SetLog(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"log": "debug",
-	})
+// GetSettings 获取配置
+func GetSettings(c *gin.Context) {
+	cfg := setup.GetSettings()
+	controller.Success(c, cfg)
 }
 
-// 应用配置handler
-func SetApp(c *gin.Context) {
+// UpdateSettings 设置配置
+func UpdateSettings(c *gin.Context) {
 	c.JSON(200, gin.H{
-		"app": "debug",
+		"setup": "debug",
 	})
 }

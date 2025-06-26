@@ -106,14 +106,6 @@ func Custom(c *gin.Context, code int, msg string, data interface{}) {
 	})
 }
 
-// 定义退出登录返回handler
-func Logout(c *gin.Context) {
-	c.JSON(200, &Response{
-		Code: SuccessCode,
-		Msg:  "success",
-	})
-}
-
 // 定义登录返回handler
 func Login(c *gin.Context, token string) {
 	c.JSON(200, &Response{

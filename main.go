@@ -15,15 +15,18 @@ import (
 )
 
 func main() {
-	vp := vp.New()
-	conf := vp.Get()
-	logrus.WithFields(conf.ToLogFields()).Debug("配置信息")
-
+	mv := vp.New()
+	vp.SetViperCallback(func() *vp.MgrViper {
+		return mv
+	})
+	conf := mv.Get()
 	lg.SetLogurs(conf.Log)
 	jwt.SetTimeout(conf.App.AuthTimeout)
 
+	logrus.WithFields(conf.ToConfigFields()).Debug("配置信息")
+
 	//配置热更新后，重新配置logrus
-	vp.AddReloadCallback(func(conf *config.Config) {
+	mv.AddReloadCallback(func(conf *config.Config) {
 		lg.SetLogurs(conf.Log)
 	})
 
@@ -35,14 +38,14 @@ func main() {
 	g.Start(r)
 
 	// 配置热更新后，重启gin
-	vp.AddReloadCallback(func(conf *config.Config) {
+	mv.AddReloadCallback(func(conf *config.Config) {
 		g.Restart(":"+conf.App.Port, nil)
 	})
 
 	for {
 		logrus.Debug("debug")
 		logrus.Info("info")
-		time.Sleep(10 * time.Second)
+		time.Sleep(20 * time.Second)
 	}
 
 }

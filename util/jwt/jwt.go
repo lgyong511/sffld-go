@@ -16,7 +16,8 @@ const (
 
 var (
 	// jwt密钥
-	secret  = []byte(time.Now().Format(time.RFC3339Nano))
+	secret = []byte(time.Now().Format(time.RFC3339Nano))
+	// jwt超时时间
 	timeout = 3
 )
 
@@ -26,6 +27,7 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
+// SetTimeout 设置超时时间
 func SetTimeout(t int) {
 	timeout = t
 }
